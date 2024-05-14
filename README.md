@@ -1,5 +1,8 @@
 # JSON Viewer
 
+## Direct Access
+
+You can also directly access the JSON viewer via this link: [JSON Viewer](https://blovario.github.io/jsonviewer/viewer.html)
 ## Description
 
 This project is a simple JSON viewer that allows formatting and displaying JSON in a tree view with collapsible lists. It is designed to be used locally in a browser without requiring a server.
@@ -48,3 +51,4 @@ Contributions are welcome! Please submit a pull request or open an issue to disc
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
