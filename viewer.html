@@ -11,7 +11,7 @@
         }
         #jsonContainer {
             width: 100%;
-            height: calc(100vh - 100px);
+            height: calc(100vh - 150px);
             margin-top: 20px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -22,9 +22,14 @@
         }
         .error {
             color: red;
+            margin-top: 10px;
         }
         button {
             margin-right: 10px;
+        }
+        #modeIndicator {
+            margin-top: 10px;
+            font-weight: bold;
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.6/jsoneditor.min.css">
@@ -33,11 +38,21 @@
     <h1>JSON Viewer</h1>
     <button onclick="switchToTreeView()">Tree-view JSON</button>
     <button onclick="switchToFormatted()">Format JSON</button>
+    <button onclick="clearJson()">Clear</button>
+    <button onclick="showHelp()">Help</button>
     <div id="jsonContainer" contenteditable="true" placeholder="Paste here..."></div>
+    <div id="modeIndicator">Mode: Edit</div>
+    <div id="errorContainer"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.6/jsoneditor.min.js"></script>
     <script>
         let editor;
         let currentMode = 'edit'; // Mode can be 'edit' or 'view'
+
+        // Load saved JSON from localStorage
+        const savedJson = localStorage.getItem('jsonContent');
+        if (savedJson) {
+            document.getElementById('jsonContainer').innerText = savedJson;
+        }
 
         function switchToTreeView() {
             const input = document.getElementById('jsonContainer').innerText.trim();
@@ -53,8 +68,9 @@
                 editor = new JSONEditor(container, options);
                 editor.set(json);
                 currentMode = 'view';
+                updateModeIndicator();
             } catch (e) {
-                output.innerHTML = `<p class="error">Error: Invalid JSON.</p>`;
+                showError('Error: Invalid JSON.');
             }
         }
 
@@ -65,6 +81,7 @@
                 const formattedJson = JSON.stringify(json, null, 4);
                 output.innerText = formattedJson;
                 currentMode = 'edit';
+                updateModeIndicator();
             } else {
                 const input = output.innerText.trim();
                 try {
@@ -72,10 +89,40 @@
                     const formattedJson = JSON.stringify(json, null, 4);
                     output.innerText = formattedJson;
                 } catch (e) {
-                    output.innerHTML = `<p class="error">Error: Invalid JSON.</p>`;
+                    showError('Error: Invalid JSON.');
                 }
             }
         }
+
+        function clearJson() {
+            const jsonContainer = document.getElementById('jsonContainer');
+            jsonContainer.innerText = '';
+            localStorage.removeItem('jsonContent');
+            if (currentMode === 'view') {
+                jsonContainer.innerHTML = ''; // Clear the editor view
+                currentMode = 'edit'; // Switch back to edit mode
+                updateModeIndicator();
+            }
+        }
+
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = `<p class="error">${message}</p>`;
+            setTimeout(() => { errorContainer.innerHTML = ''; }, 5000);
+        }
+
+        function updateModeIndicator() {
+            document.getElementById('modeIndicator').innerText = `Mode: ${currentMode.charAt(0).toUpperCase() + currentMode.slice(1)}`;
+        }
+
+        function showHelp() {
+            alert('Utilisez "Tree-view JSON" pour afficher le JSON en mode arborescent et "Format JSON" pour le formater. "Clear" efface le contenu.');
+        }
+
+        // Save JSON to localStorage on input
+        document.getElementById('jsonContainer').addEventListener('input', () => {
+            localStorage.setItem('jsonContent', document.getElementById('jsonContainer').innerText);
+        });
     </script>
 </body>
 </html>
